@@ -1,0 +1,19 @@
+$font-family-base: system-ui, Avenir, Helvetica, Arial, sans-serif;
+// read radius from CSS var so brands/themes can override without recompiling
+$radius-md: var(--radius-md, 8px);
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-6: 1.5rem;
+$space-8: 2rem;
+
+// semantic tokens
+$color-bg: var(--color-bg);
+$color-text: var(--color-text);
+$color-muted: var(--color-muted);
+$color-border: var(--color-border);
+$color-primary: var(--color-primary);
+$color-surface: var(--color-surface);
+$color-text-primary: var(--color-text-primary);
+

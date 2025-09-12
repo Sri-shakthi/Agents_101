@@ -1,0 +1,26 @@
+@use '../../styles/variables' as *;
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  padding: 0.6em 1.2em;
+  border-radius: $radius-md;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn--primary {
+  background: $color-primary;
+  color: white;
+}
+
+.btn--secondary {
+  background: $color-surface;
+  color: $color-text;
+  border-color: $color-border;
+}
+
+
