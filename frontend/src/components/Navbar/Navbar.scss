@@ -21,18 +21,25 @@
   width: auto;
 }
 
-.navbar__nav a {
-  margin-right: $space-4;
-  color: $color-text;
+// remove old nav spacing
+
+// remove old active style
+
+// remove old hover style
+
+// mobile toggle
+// toggle no longer used
+
+@media (max-width: 900px) {
+  .navbar__inner { justify-content: space-between; }
 }
 
-.navbar__nav .active {
-  text-decoration: underline;
-  color: $color-primary;
+.navbar__actions {
+  margin-left: auto;
 }
 
-.navbar__nav a:hover {
-  color: $color-primary;
+.navbar__login .btn {
+  padding: 0.5rem 1rem;
 }
 
 

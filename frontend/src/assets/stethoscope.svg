@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128" role="img" aria-label="Stethoscope icon - solid bell">
+  <g fill="none" stroke="#111827" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="14" cy="8" r="2.5" fill="#111827"/>
+    <circle cx="50" cy="8" r="2.5" fill="#111827"/>
+    <path d="M14 11 C18 20, 24 23, 32 23"/>
+    <path d="M50 11 C46 20, 40 23, 32 23"/>
+    <path d="M32 23 C36 32, 42 36, 48 39 C52 41, 54 42, 54 46"/>
+    <!-- chest piece filled to look stronger -->
+    <circle cx="54" cy="46" r="4" fill="#111827" />
+    <circle cx="54" cy="46" r="1.2" fill="#ffffff"/>
+  </g>
+</svg>
