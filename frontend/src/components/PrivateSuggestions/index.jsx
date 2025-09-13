@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { http } from '../../services/http.js'
+import { meetingApi } from '../../services/meetingApi.js'
 import './PrivateSuggestions.scss'
 
 const seedSuggestions = [
@@ -18,7 +19,16 @@ function buildSuggestion(nextId) {
   return { id: nextId, title: base.title, conf: jitter, hint: base.hint, ts: Date.now() }
 }
 
-function PrivateSuggestions({ showLive = true, showProjection = true, showHeader = true, showList = true }) {
+function PrivateSuggestions({ 
+  showLive = true, 
+  showProjection = true, 
+  showHeader = true, 
+  showList = true,
+  transcript = '',
+  patientInfo = null,
+  meetingId = null,
+  isAIMode = false
+}) {
   const [items, setItems] = useState(() => [
     { id: 1, ...seedSuggestions[0], conf: 92, ts: Date.now() - 20000 },
     { id: 2, ...seedSuggestions[1], conf: 85, ts: Date.now() - 15000 },
@@ -27,6 +37,43 @@ function PrivateSuggestions({ showLive = true, showProjection = true, showHeader
   const nextIdRef = useRef(4)
   const liveEveryMs = 4000
   const [editingId, setEditingId] = useState(null)
+  const [aiSuggestions, setAiSuggestions] = useState([])
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false)
+
+  // Generate AI suggestions when transcript changes
+  useEffect(() => {
+    if (isAIMode && transcript && transcript.length > 50) {
+      generateAISuggestions()
+    }
+  }, [transcript, isAIMode])
+
+  const generateAISuggestions = async () => {
+    if (isGeneratingAI) return
+    
+    setIsGeneratingAI(true)
+    try {
+      const response = await meetingApi.generateFollowUpQuestions(transcript, patientInfo, 0)
+      
+      if (response.success && response.data.questions) {
+        const newSuggestions = response.data.questions.map((q, index) => ({
+          id: `ai_${Date.now()}_${index}`,
+          title: q.question,
+          conf: Math.round(q.confidence * 100),
+          hint: q.context || `Category: ${q.category}`,
+          ts: Date.now(),
+          category: q.category,
+          priority: q.priority,
+          isAI: true
+        }))
+        
+        setAiSuggestions(prev => [...newSuggestions, ...prev].slice(0, 10))
+      }
+    } catch (error) {
+      console.error('Failed to generate AI suggestions:', error)
+    } finally {
+      setIsGeneratingAI(false)
+    }
+  }
 
   useEffect(() => {
     if (editingId != null) return
@@ -59,6 +106,36 @@ function PrivateSuggestions({ showLive = true, showProjection = true, showHeader
 
       {showList && (
         <div className={`ps-list${editingId != null ? ' ps-list--locked' : ''}`}>
+          {/* AI Suggestions */}
+          {isAIMode && aiSuggestions.length > 0 && (
+            <div className="ai-suggestions-section">
+              <div className="ai-suggestions-header">
+                <span className="ai-badge">AI Generated</span>
+                {isGeneratingAI && <span className="generating-indicator">Generating...</span>}
+              </div>
+              {aiSuggestions.map((s) => (
+                <SuggestionCard
+                  key={s.id}
+                  item={s}
+                  onStartEdit={() => setEditingId(s.id)}
+                  onEndEdit={() => setEditingId(null)}
+                  onSave={(updatedTitle) => {
+                    setAiSuggestions((prev) => prev.map((it) => it.id === s.id ? { ...it, title: updatedTitle } : it))
+                  }}
+                  onDismiss={() => {
+                    setAiSuggestions((prev) => prev.filter((it) => it.id !== s.id))
+                    if (editingId === s.id) setEditingId(null)
+                  }}
+                  onAccept={async () => {
+                    await meetingApi.acceptSuggestion(s.id, s.title, s.conf, s.category)
+                    setAiSuggestions((prev) => prev.filter((it) => it.id !== s.id))
+                  }}
+                />
+              ))}
+            </div>
+          )}
+          
+          {/* Regular Suggestions */}
           {items.map((s) => (
             <SuggestionCard
               key={s.id}
@@ -98,7 +175,7 @@ function PrivateSuggestions({ showLive = true, showProjection = true, showHeader
 
 export default PrivateSuggestions
 
-function SuggestionCard({ item, onSave, onStartEdit, onEndEdit, onDismiss }) {
+function SuggestionCard({ item, onSave, onStartEdit, onEndEdit, onDismiss, onAccept }) {
   const [editing, setEditing] = useState(false)
   const [title, setTitle] = useState(item.title)
   const [saving, setSaving] = useState(false)
@@ -158,7 +235,19 @@ function SuggestionCard({ item, onSave, onStartEdit, onEndEdit, onDismiss }) {
       <div className="ps-time">{time.format(new Date(item.ts))}</div>
       <div className="ps-hint">{item.hint}</div>
       <div className="ps-actions">
-        <button className="ps-btn ps-btn--primary" onClick={() => { focusCard(); acceptSuggestion(item) }}>Accept</button>
+        <button 
+          className="ps-btn ps-btn--primary" 
+          onClick={() => { 
+            focusCard(); 
+            if (onAccept) {
+              onAccept();
+            } else {
+              acceptSuggestion(item);
+            }
+          }}
+        >
+          Accept
+        </button>
         <button className="ps-btn" onClick={() => { focusCard(); onDismiss && onDismiss() }}>Dismiss</button>
         {editing ? (
           <>

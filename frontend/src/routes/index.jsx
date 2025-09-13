@@ -3,6 +3,8 @@ import RootLayout from '../layouts/RootLayout.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
 import DoctorLoginPage from '../pages/DoctorLoginPage.jsx'
 import DoctorDashboardPage from '../pages/DoctorDashboardPage.jsx'
+import PatientMeetingPage from '../pages/PatientMeetingPage.jsx'
+import PatientTestPage from '../pages/PatientTestPage.jsx'
 import ProtectedRoute from './ProtectedRoute.jsx'
 import PublicRoute from './PublicRoute.jsx'
 
@@ -24,6 +26,8 @@ const router = createBrowserRouter([
           { path: 'dashboard', element: <DoctorDashboardPage /> },
         ],
       },
+      { path: 'patient/meeting/:meetingId', element: <PatientMeetingPage /> },
+      { path: 'patient/test', element: <PatientTestPage /> },
     ],
   },
   { path: '*', element: <NotFoundPage /> },

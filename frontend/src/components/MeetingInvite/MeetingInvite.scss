@@ -1,0 +1,302 @@
+.meeting-invite-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-4);
+}
+
+.meeting-invite-modal {
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.invite-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.invite-header h2 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-normal);
+  
+  &:hover {
+    background: var(--color-gray-100);
+    color: var(--color-text-primary);
+  }
+}
+
+.invite-content {
+  padding: var(--space-6);
+}
+
+.patient-info, .meeting-link, .invite-actions, .doctor-actions, .meeting-instructions {
+  margin-bottom: var(--space-6);
+}
+
+.patient-info:last-child, .meeting-link:last-child, .invite-actions:last-child, .doctor-actions:last-child, .meeting-instructions:last-child {
+  margin-bottom: 0;
+}
+
+.patient-info h3, .meeting-link h3, .invite-actions h3, .doctor-actions h3, .meeting-instructions h3 {
+  margin: 0 0 var(--space-3) 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.info-grid {
+  display: grid;
+  gap: var(--space-2);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item .label {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.info-item .value {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.link-container {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.link-input {
+  flex: 1;
+  padding: var(--space-3);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-lg);
+  background: var(--color-gray-50);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: 'Courier New', monospace;
+}
+
+.copy-btn {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  white-space: nowrap;
+  
+  &:hover {
+    background: var(--color-primary-dark);
+    border-color: var(--color-primary-dark);
+  }
+  
+  &.copied {
+    background: var(--color-success);
+    border-color: var(--color-success);
+  }
+}
+
+.link-hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-3);
+}
+
+.action-btn {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-gray-300);
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  
+  &:hover:not(:disabled) {
+    background: var(--color-gray-50);
+    border-color: var(--color-gray-400);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.sms-btn:hover:not(:disabled) {
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.email-btn:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.whatsapp-btn:hover:not(:disabled) {
+  background: #25D366;
+  border-color: #25D366;
+  color: white;
+}
+
+.meeting-instructions ul {
+  margin: 0;
+  padding-left: var(--space-4);
+  color: var(--color-text-secondary);
+}
+
+.meeting-instructions li {
+  margin-bottom: var(--space-2);
+  line-height: 1.6;
+}
+
+.meeting-instructions li:last-child {
+  margin-bottom: 0;
+}
+
+// Doctor Actions
+.doctor-actions {
+  background: var(--color-primary-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border-left: 4px solid var(--color-primary);
+}
+
+.doctor-actions p {
+  margin: 0 0 var(--space-4) 0;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.doctor-buttons {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.join-meeting-btn, .close-btn-secondary {
+  padding: var(--space-4) var(--space-6);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  min-width: 150px;
+}
+
+.join-meeting-btn {
+  background: var(--color-primary);
+  color: white;
+  
+  &:hover {
+    background: var(--color-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  }
+}
+
+.close-btn-secondary {
+  background: var(--color-gray-200);
+  color: var(--color-text-primary);
+  
+  &:hover {
+    background: var(--color-gray-300);
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .meeting-invite-overlay {
+    padding: var(--space-2);
+  }
+  
+  .invite-header, .invite-content {
+    padding: var(--space-4);
+  }
+  
+  .link-container {
+    flex-direction: column;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-btn {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .meeting-invite-modal {
+    margin: 0;
+    border-radius: var(--radius-lg);
+  }
+  
+  .invite-header h2 {
+    font-size: var(--font-size-lg);
+  }
+  
+  .info-grid {
+    padding: var(--space-3);
+  }
+}
