@@ -13,6 +13,8 @@ const __dirname = path.dirname(__filename);
 const aai = new AssemblyAI({ apiKey: process.env.ASSEMBLYAI_API_KEY });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+console.log(openai, "ooooooooooooooooooooooooooooooo")
+
 // In-memory store per participant
 const transcriptStore = {}; // { participantId: [{ raw, clean, meaningful, timestamp }] }
 
@@ -24,13 +26,27 @@ if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
 // ----------------------
 function convertToWav(inputPath, outputPath) {
   return new Promise((resolve, reject) => {
-    ffmpeg(inputPath)
-      .output(outputPath)
-      .audioChannels(1)
-      .audioFrequency(16000)
-      .on("end", () => resolve(outputPath))
-      .on("error", reject)
-      .run();
+    // Check if ffmpeg is available
+    ffmpeg.getAvailableFormats((err, formats) => {
+      if (err) {
+        console.error("FFmpeg not available:", err.message);
+        // Return original path if ffmpeg is not available
+        resolve(inputPath);
+        return;
+      }
+      
+      ffmpeg(inputPath)
+        .output(outputPath)
+        .audioChannels(1)
+        .audioFrequency(16000)
+        .on("end", () => resolve(outputPath))
+        .on("error", (err) => {
+          console.error("FFmpeg conversion failed:", err.message);
+          // Return original path if conversion fails
+          resolve(inputPath);
+        })
+        .run();
+    });
   });
 }
 
@@ -40,6 +56,13 @@ function cleanTranscript(text) {
 
 async function senseCheck(text) {
   if (!text || text.trim().length < 2) return "";
+  
+  // Check if OpenAI API key is configured
+  if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your-openai-api-key-here') {
+    console.log("OpenAI API key not configured, skipping GPT processing");
+    return text; // Return original text without GPT processing
+  }
+  
   try {
     const prompt = `
 You are a transcript cleaner and translator.
@@ -48,7 +71,7 @@ Always convert non-English (Hindi, Tamil, Telugu, Kannada) to clear English.
 Return meaningful text only.
     `;
     const resp = await openai.chat.completions.create({
-      model: "gpt-5-mini",
+      model: "gpt-4o-mini",
       messages: [
         { role: "system", content: prompt },
         { role: "user", content: text }

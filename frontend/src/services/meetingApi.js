@@ -1,5 +1,5 @@
 // For network testing, replace with your host computer's IP
-const API_BASE_URL = 'http://10.30.2.193:5000';
+const API_BASE_URL = 'http://10.30.2.193:8080';
 // const API_BASE_URL = 'http://localhost:5000';
 
 export const meetingApi = {
@@ -14,7 +14,8 @@ export const meetingApi = {
         body: JSON.stringify({
           hostName,
           hostId
-        })
+        }),
+        mode: 'cors'
       });
 
       const data = await response.json();
@@ -37,7 +38,8 @@ export const meetingApi = {
           meetingId,
           participantName,
           participantId
-        })
+        }),
+        mode: 'cors'
       });
 
       const data = await response.json();

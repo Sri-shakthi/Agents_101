@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Video from "twilio-video";
 import "./VideoRTC.scss";
 
@@ -6,69 +6,90 @@ const VideoRTC = ({ meetingData, onMeetingEnd }) => {
   const webcamFeedContainerRef = useRef(null);
   const mainFeedRef = useRef(null);
   const transcriptRef = useRef(null);
+  const roomRef = useRef(null); // Use a ref to hold the room object
+  const [isConnected, setIsConnected] = useState(false); // New state to track connection status
 
-  let room;
   let localDataTrack;
 
   // ✅ Initialize the Twilio room
   useEffect(() => {
     const startRoom = async () => {
-      if (!meetingData) {
-        console.error('No meeting data provided');
+      // Prevent connection if no meeting data or if we are already connected
+      if (!meetingData || isConnected) {
         return;
       }
 
       const { roomName, token } = meetingData;
-      room = await joinVideoRoom(roomName, token);
+     
+      try {
+        const room = await joinVideoRoom(roomName, token);
+        roomRef.current = room; // Store the room object in the ref
+        setIsConnected(true); // Update state to show we are connected
 
-      // Handle the local participant first
-      handleConnectedParticipant(room.localParticipant, true);
-      
-      // Then handle all existing remote participants
-      room.participants.forEach(participant => {
-        handleConnectedParticipant(participant, false);
-      });
+        // Handle the local participant first
+        handleConnectedParticipant(room.localParticipant, true);
+       
+        // Then handle all existing remote participants
+        room.participants.forEach(participant => {
+          handleConnectedParticipant(participant, false);
+        });
 
-      room.on("participantConnected", participant => {
-        handleConnectedParticipant(participant, false);
-      });
-      room.on("participantDisconnected", handleDisconnectedParticipant);
+        room.on("participantConnected", participant => {
+          handleConnectedParticipant(participant, false);
+        });
+        room.on("participantDisconnected", handleDisconnectedParticipant);
 
-      // Handle room disconnection
-      room.on("disconnected", () => {
-        console.log("Room disconnected");
-        if (onMeetingEnd) {
-          onMeetingEnd();
-        }
-      });
+        // Handle room disconnection
+        room.on("disconnected", () => {
+          console.log("Room disconnected");
+          if (onMeetingEnd) {
+            onMeetingEnd();
+          }
+          setIsConnected(false); // Reset state on disconnection
+        });
 
-      window.addEventListener("beforeunload", () => room.disconnect());
+        window.addEventListener("beforeunload", () => room.disconnect());
 
-      // 🎤 Start mic capture + transcription
-      startLocalRecording();
+        // 🎤 Start mic capture + transcription
+        startLocalRecording();
+
+      } catch (error) {
+        console.error("Failed to connect to Twilio room:", error);
+        setIsConnected(false);
+      }
     };
 
     startRoom();
 
     return () => {
-      if (room) room.disconnect();
+      // Cleanup function to disconnect the room when component unmounts
+      if (roomRef.current) {
+        roomRef.current.disconnect();
+        roomRef.current = null;
+        setIsConnected(false);
+      }
     };
-  }, [meetingData]);
+  }, [meetingData, isConnected]); // Add isConnected to the dependency array
 
   // ✅ Join room
   const joinVideoRoom = async (roomName, token) => {
-    const { LocalDataTrack, createLocalVideoTrack, createLocalAudioTrack } =
-      Video;
+    const { LocalDataTrack, createLocalVideoTrack, createLocalAudioTrack } = Video;
 
-    let localVideoTrack = await createLocalVideoTrack({ facingMode: "user" });
-    let localAudioTrack = await createLocalAudioTrack();
-    localDataTrack = new LocalDataTrack();
-
-    return await Video.connect(token, {
-      name: roomName,
-      audio: { noiseSuppression: true, echoCancellation: true },
-      tracks: [localVideoTrack, localAudioTrack, localDataTrack],
-    });
+    try {
+      let localVideoTrack = await createLocalVideoTrack({ facingMode: "user" });
+      let localAudioTrack = await createLocalAudioTrack();
+      localDataTrack = new LocalDataTrack();
+      console.log({ message: "Connection to video", token, roomName });
+     
+      return await Video.connect(token, {
+        name: roomName,
+        audio: { noiseSuppression: true, echoCancellation: true },
+        tracks: [localVideoTrack, localAudioTrack, localDataTrack],
+      });
+    } catch (error) {
+      console.error("Error joining video room:", error);
+      throw error;
+    }
   };
 
   // ✅ Handle new participant
@@ -112,7 +133,7 @@ const VideoRTC = ({ meetingData, onMeetingEnd }) => {
 
         // Clear any old track attachments before adding the new one
         participantDiv.innerHTML = "";
-        
+       
         if (isLocal) {
           // Local participant: Attach their video to the small webcam container.
           if (track.kind === "video") {
@@ -172,7 +193,7 @@ const VideoRTC = ({ meetingData, onMeetingEnd }) => {
       const pElement = document.createElement("p");
       pElement.className = "transcript-p";
       const username =
-        identity === room.localParticipant.identity
+        identity === roomRef.current.localParticipant.identity
           ? "[ You ]"
           : `[ user-${truncate(identity, 10)} ]`;
       pElement.innerText = `${username}: ${transcript}`;
@@ -205,19 +226,17 @@ const VideoRTC = ({ meetingData, onMeetingEnd }) => {
 
         const formData = new FormData();
         formData.append("audio", blob, "audio.webm");
-        formData.append("participantId", room.localParticipant.identity);
+        formData.append("participantId", roomRef.current.localParticipant.identity);
 
         try {
-          // For network testing, replace with your host computer's IP
-          // Example: const response = await fetch("http://192.168.1.100:5000/uploadAudio", {
-          const response = await fetch("http://10.30.2.193:5000/uploadAudio", {
+          const response = await fetch("http://10.30.2.193:8080/uploadAudio", {
             method: "POST",
             body: formData,
           });
           const data = await response.json();
 
           if (data.transcript) {
-            showTranscript(data.transcript, room.localParticipant.identity);
+            showTranscript(data.transcript, roomRef.current.localParticipant.identity);
 
             if (localDataTrack) {
               localDataTrack.send(

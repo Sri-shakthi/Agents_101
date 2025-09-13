@@ -12,7 +12,5 @@ document.documentElement.setAttribute('data-theme', useAppStore.getState().theme
 document.documentElement.setAttribute('data-brand', useAppStore.getState().brand)
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <App />
 )

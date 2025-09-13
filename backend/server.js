@@ -1,8 +1,8 @@
 import express from "express";
+import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import multer from "multer";
 import twilio from "twilio";
-import dotenv from "dotenv";
 import cors from "cors";
 import { transcribeParticipant, getTranscripts } from "./transcription.js"; // correct import
 
@@ -12,7 +12,7 @@ const { AccessToken } = twilio.jwt;
 const { VideoGrant } = AccessToken;
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 8080;
 
 // In-memory storage for active meetings
 const activeMeetings = new Map();
@@ -31,11 +31,35 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(express.json());
+// CORS configuration for cross-laptop access
+app.use((req, res, next) => {
+  // Allow all origins for development
+  const origin = req.headers.origin;
+  console.log('Request from origin:', origin);
+  
+  res.header('Access-Control-Allow-Origin', origin || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Max-Age', '86400'); // 24 hours
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    console.log('CORS preflight request from:', origin);
+    res.status(200).end();
+    return;
+  }
+  
+  next();
+});
+
+// Also use cors middleware as backup
 app.use(cors({ 
-  origin: true, // Allow all origins for development
+  origin: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
   credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
+  optionsSuccessStatus: 200
 }));
 
 app.use(express.static('public'));
@@ -70,6 +94,28 @@ function getAccessToken(roomName) {
 // ----------------------
 // Routes
 // ----------------------
+
+// Test endpoint for CORS debugging
+app.get('/test-cors', (req, res) => {
+  console.log('Test CORS endpoint hit from:', req.headers.origin);
+  res.json({ 
+    success: true, 
+    message: 'CORS is working!',
+    origin: req.headers.origin,
+    userAgent: req.headers['user-agent'],
+    timestamp: new Date().toISOString(),
+    serverIP: req.connection.remoteAddress
+  });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
 app.post('/join-room', async (req, res) => {
   const { roomName } = req.body;
   if (!roomName) return res.status(400).send({ success: false, message: "roomName required" });
@@ -122,10 +168,10 @@ app.post('/create-meeting', async (req, res) => {
         success: false, 
         message: "hostName is required" 
       });
-    }
-
-    // Generate unique meeting ID
-    const meetingId = uuidv4();
+      }
+  
+      // Generate unique meeting ID
+      const meetingId = uuidv4();
     const roomName = `meeting_${meetingId}`;
     
     // Create Twilio room
@@ -357,4 +403,7 @@ app.get('/meetings', (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`🚀 Server running at http://localhost:${port}`));
+app.listen(port, '0.0.0.0', () => {
+  console.log(`🚀 Server running at http://localhost:${port}`);
+  console.log(`🌐 Network access: http://10.30.2.193:${port}`);
+});
