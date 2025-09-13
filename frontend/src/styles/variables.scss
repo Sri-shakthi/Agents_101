@@ -1,0 +1,18 @@
+// SCSS Variables that reference CSS custom properties
+$font-family-base: var(--font-family-base);
+$radius-md: var(--radius-md);
+$space-1: var(--space-1);
+$space-2: var(--space-2);
+$space-3: var(--space-3);
+$space-4: var(--space-4);
+$space-6: var(--space-6);
+$space-8: var(--space-8);
+
+// Semantic tokens
+$color-bg: var(--color-bg);
+$color-text: var(--color-text);
+$color-muted: var(--color-text-muted);
+$color-border: var(--color-border);
+$color-primary: var(--color-primary);
+$color-surface: var(--color-surface);
+$color-text-primary: var(--color-text-primary);

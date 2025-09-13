@@ -29,6 +29,12 @@
   margin-bottom: 12px;
 }
 
+.video-panel__actions {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
 .video-title {
   font-weight: 600;
 }

@@ -139,7 +139,7 @@
 }
 
 .review-btn {
-  width: 100%;
+  width: 60%;
   background: #10b981;
   color: white;
   border: none;
@@ -157,6 +157,37 @@
 
 .review-btn:hover {
   background: #059669;
+}
+
+.patient-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.patient-actions .ps-btn {
+  flex: 1;
+}
+
+/* Ensure ps-btn styles work in production */
+.ps-btn {
+  border: 1px solid var(--color-border, #e5e7eb);
+  background: var(--color-bg, #ffffff);
+  border-radius: var(--radius-lg, 0.5rem);
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  cursor: pointer;
+  transition: var(--transition-normal, 200ms ease-in-out);
+}
+
+.ps-btn--primary {
+  background: var(--color-secondary, #10b981);
+  color: var(--color-white, #ffffff);
+  border-color: var(--color-secondary, #10b981);
+}
+
+.ps-btn--primary:hover {
+  background: var(--color-secondary-dark, #059669);
+  border-color: var(--color-secondary-dark, #059669);
 }
 
 @media (max-width: 768px) {
