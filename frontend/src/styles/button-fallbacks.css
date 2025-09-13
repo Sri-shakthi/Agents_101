@@ -1,0 +1,48 @@
+/* Fallback button styles for production */
+.ps-btn {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: 200ms ease-in-out;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.ps-btn--primary {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+}
+
+.ps-btn--primary:hover {
+  background: #059669 !important;
+  border-color: #059669 !important;
+}
+
+/* Button component should use purple, not green */
+.btn--primary {
+  background: #8b5cf6 !important;
+  color: #ffffff !important;
+  border-color: #8b5cf6 !important;
+}
+
+.btn--primary:hover {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+}
+
+.ps-btn--secondary {
+  background: #ffffff;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+.ps-btn--secondary:hover {
+  background: #f9fafb;
+}
+
+.ps-btn--block {
+  width: 100%;
+}

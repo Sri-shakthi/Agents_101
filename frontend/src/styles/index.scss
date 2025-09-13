@@ -1,5 +1,5 @@
 @use './themes';
-@use './variables';
+@use './variables' as *;
 @use './base';
 @use './brands/acko';
 @use './brands/tricog';

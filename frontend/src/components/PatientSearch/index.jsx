@@ -126,9 +126,12 @@ function PatientSearch({ onPatientSelect, selectedPatientId }) {
               </div>
             </div>
 
-            <button className="review-btn">
-              Review Patient →
-            </button>
+            <div className="patient-actions">
+              <button className="ps-btn ps-btn--primary">Download Report</button>
+              <button className="review-btn">
+                Review Patient →
+              </button>
+            </div>
           </div>
         ))}
       </div>
