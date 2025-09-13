@@ -5,6 +5,7 @@ import PrivateSuggestions from '../components/PrivateSuggestions/index.jsx'
 import PatientSearch from '../components/PatientSearch/index.jsx'
 import { patientApi } from '../services/patientApi.js'
 import './DoctorLoginPage.scss'
+import VideoRTC from '../components/VideoRTC/index.jsx'
 
 function DoctorDashboardPage() {
   const user = useAppStore((s) => s.user)
@@ -87,13 +88,14 @@ function DoctorDashboardPage() {
             </div>
             <div className="meeting-content meeting-content--light">
               <div className="meeting-video">
-                <VideoPanel 
+                {/* <VideoPanel 
                   showDetails={!meeting} 
                   showVideo={true} 
                   showVideoBox={true} 
                   showStartButton={false}
                   patient={selectedPatient}
-                />
+                /> */}
+                <VideoRTC />
               </div>
               <div className="meeting-docked">
                 <PrivateSuggestions showLive={true} showProjection={false} showHeader={true} showList={true} />
