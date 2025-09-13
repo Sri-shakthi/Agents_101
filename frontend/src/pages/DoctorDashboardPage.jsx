@@ -46,7 +46,6 @@ function DoctorDashboardPage() {
             </div>
           </div>
           <div className="dh-right">
-            <button className="ps-btn ps-btn--primary">Download Report</button>
             {/* <button className="ps-btn ps-btn--secondary" onClick={logout}>Logout</button> */}
           </div>
         </header>

@@ -13,8 +13,14 @@
 }
 
 .btn--primary {
-  background: $color-primary;
-  color: white;
+  background: #8b5cf6 !important;
+  color: #ffffff !important;
+  border-color: #8b5cf6 !important;
+}
+
+.btn--primary:hover {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
 }
 
 .btn--secondary {
