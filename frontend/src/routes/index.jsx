@@ -3,8 +3,10 @@ import RootLayout from '../layouts/RootLayout.jsx'
 import NotFoundPage from '../pages/NotFoundPage.jsx'
 import DoctorLoginPage from '../pages/DoctorLoginPage.jsx'
 import DoctorDashboardPage from '../pages/DoctorDashboardPage.jsx'
+import GuestPage from '../pages/GuestPage.jsx'
 import ProtectedRoute from './ProtectedRoute.jsx'
 import PublicRoute from './PublicRoute.jsx'
+import GuestRoute from './GuestRoute.jsx'
 
 const router = createBrowserRouter([
   {
@@ -16,6 +18,11 @@ const router = createBrowserRouter([
         <PublicRoute>
           <DoctorLoginPage />
         </PublicRoute>
+      ) },
+      { path: 'guest', element: (
+        <GuestRoute>
+          <GuestPage />
+        </GuestRoute>
       ) },
       {
         path: 'doctor',

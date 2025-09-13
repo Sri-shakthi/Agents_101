@@ -14,21 +14,43 @@ import './DoctorLoginPage.scss';
 function DoctorLoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [guestId, setGuestId] = useState('');
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false);
+  const [isGuestMode, setIsGuestMode] = useState(false);
   const login = useAppStore((s) => s.login);
+  const guestLogin = useAppStore((s) => s.guestLogin);
   const navigate = useNavigate();
 
   async function onSubmit(e) {
     e.preventDefault()
     setLoading(true)
-    const res = await login({ username, password })
-    if (res.success) {
-      navigate('/doctor/dashboard', { replace: true })
+    setError('')
+    
+    if (isGuestMode) {
+      const res = await guestLogin({ guestId })
+      if (res.success) {
+        navigate('/guest', { replace: true })
+      } else {
+        setError(res.error)
+      }
     } else {
-      setError(res.error)
+      const res = await login({ username, password })
+      if (res.success) {
+        navigate('/doctor/dashboard', { replace: true })
+      } else {
+        setError(res.error)
+      }
     }
     setLoading(false)
+  }
+
+  function handleModeToggle() {
+    setIsGuestMode(!isGuestMode)
+    setError('')
+    setUsername('')
+    setPassword('')
+    setGuestId('')
   }
 
   return (
@@ -37,29 +59,77 @@ function DoctorLoginPage() {
         <div className="login-pane login-pane--form">
           <div className="pane-inner">
             <img src={ackoLogo} alt="ACKO" className="login-card__logo" />
-              <form onSubmit={onSubmit} className="login-form">
-              <label className="login-field">
-                <span className="login-field__icon" aria-hidden="true">
-                  <img src={iconUser} alt="" />
-                </span>
-                <input placeholder="Enter your username" value={username} onChange={(e) => setUsername(e.target.value)} />
-              </label>
-              <label className="login-field">
-                <span className="login-field__icon" aria-hidden="true">
-                  <img src={iconLock} alt="" />
-                </span>
-                <input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
-              </label>
-              {error && <p className="login-error">{error}</p>}
-              <div className="login-row">
-                <label className="remember">
-                  <input type="checkbox" />
-                  Remember me
+            
+            {/* Login Mode Toggle */}
+            <div className="login-mode-toggle">
+              <button 
+                type="button" 
+                className={`mode-btn ${!isGuestMode ? 'active' : ''}`}
+                onClick={() => setIsGuestMode(false)}
+              >
+                Doctor Login
+              </button>
+              <button 
+                type="button" 
+                className={`mode-btn ${isGuestMode ? 'active' : ''}`}
+                onClick={() => setIsGuestMode(true)}
+              >
+                Guest Login
+              </button>
+            </div>
+            
+            <form onSubmit={onSubmit} className="login-form">
+              {!isGuestMode ? (
+                <>
+                  <label className="login-field">
+                    <span className="login-field__icon" aria-hidden="true">
+                      <img src={iconUser} alt="" />
+                    </span>
+                    <input 
+                      placeholder="Enter your username" 
+                      value={username} 
+                      onChange={(e) => setUsername(e.target.value)} 
+                    />
+                  </label>
+                  <label className="login-field">
+                    <span className="login-field__icon" aria-hidden="true">
+                      <img src={iconLock} alt="" />
+                    </span>
+                    <input 
+                      type="password" 
+                      placeholder="Enter your password" 
+                      value={password} 
+                      onChange={(e) => setPassword(e.target.value)} 
+                    />
+                  </label>
+                </>
+              ) : (
+                <label className="login-field">
+                  <span className="login-field__icon" aria-hidden="true">
+                    <img src={iconUser} alt="" />
+                  </span>
+                  <input 
+                    placeholder="Enter your guest ID" 
+                    value={guestId} 
+                    onChange={(e) => setGuestId(e.target.value)} 
+                  />
                 </label>
-                <a href="#" className="forgot">Forgot password?</a>
-              </div>
+              )}
+              
+              {error && <p className="login-error">{error}</p>}
+              
+              {!isGuestMode && (
+                <div className="login-row">
+                  <label className="remember">
+                    <input type="checkbox" />
+                    Remember me
+                  </label>
+                  <a href="#" className="forgot">Forgot password?</a>
+                </div>
+              )}
+              
               <Button type="submit" className="login-submit" disabled={loading}>
-                {loading ? 'Signing in…' : 'Sign in as Doctor'}
+                {loading ? 'Signing in…' : (isGuestMode ? 'Sign in as Guest' : 'Sign in as Doctor')}
               </Button>
             </form>
           </div>

@@ -12,13 +12,25 @@
   font-weight: 600;
 }
 
-.btn--primary {
+.btn.btn--primary {
   background: #8b5cf6 !important;
   color: #ffffff !important;
   border-color: #8b5cf6 !important;
 }
 
-.btn--primary:hover {
+.btn.btn--primary:hover {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+}
+
+/* Override Bootstrap button styles */
+button.btn.btn--primary {
+  background: #8b5cf6 !important;
+  color: #ffffff !important;
+  border-color: #8b5cf6 !important;
+}
+
+button.btn.btn--primary:hover {
   background: #7c3aed !important;
   border-color: #7c3aed !important;
 }

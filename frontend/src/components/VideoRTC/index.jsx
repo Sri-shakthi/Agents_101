@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import Video from "twilio-video";
+import "./VideoRTC.scss";
 
 const VideoRTC = () => {
   const webcamFeedContainerRef = useRef(null);
@@ -236,21 +235,23 @@ const VideoRTC = () => {
   };
 
   return (
-    <div className="container-fluid bg-dark main-container">
-      <div className="row p-3">
-        <div className="col-9" id="active-speaker-container">
-          <div ref={mainFeedRef} id="main-feed"></div>
+    <div className="video-rtc-container">
+      <div className="container-fluid bg-dark main-container">
+        <div className="row p-3">
+          <div className="col-9" id="active-speaker-container">
+            <div ref={mainFeedRef} id="main-feed"></div>
+            <div
+              ref={transcriptRef}
+              id="live-transcript-container"
+              className="text-light text-center"
+            ></div>
+          </div>
           <div
-            ref={transcriptRef}
-            id="live-transcript-container"
-            className="text-light text-center"
+            className="col-3 overflow-scroll"
+            ref={webcamFeedContainerRef}
+            id="webcam-feed-container"
           ></div>
         </div>
-        <div
-          className="col-3 overflow-scroll"
-          ref={webcamFeedContainerRef}
-          id="webcam-feed-container"
-        ></div>
       </div>
     </div>
   );

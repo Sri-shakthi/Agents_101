@@ -1,0 +1,101 @@
+// Custom styles for VideoRTC component
+.video-rtc-container {
+  // Custom grid system for VideoRTC
+  .container-fluid {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+  }
+  
+  .col-9 {
+    flex: 0 0 75%;
+    max-width: 75%;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+  
+  .col-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+  
+  .p-3 {
+    padding: 1rem !important;
+  }
+  
+  .bg-dark {
+    background-color: #000 !important;
+  }
+  
+  .text-light {
+    color: #f8f9fa !important;
+  }
+  
+  .text-center {
+    text-align: center !important;
+  }
+  
+  .overflow-scroll {
+    overflow: auto !important;
+  }
+  
+  // Custom styles for VideoRTC
+  .main-container {
+    background-color: #000;
+    min-height: 100vh;
+  }
+  
+  .participantDiv {
+    margin-top: 0.5rem;
+    position: relative;
+  }
+  
+  .usernameDiv {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border-radius: 0.25rem;
+  }
+  
+  .transcript-p {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+  
+  #main-feed {
+    width: 100%;
+    height: 400px;
+    background: #333;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  #webcam-feed-container {
+    max-height: 500px;
+  }
+  
+  #live-transcript-container {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 0.5rem;
+  }
+}
