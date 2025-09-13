@@ -90,4 +90,51 @@
   .info-features { grid-template-columns: 1fr; }
 }
 
+// Meeting styles
+.meeting-link {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  margin-top: var(--space-4, 1rem);
+  
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-secondary, #6b7280);
+  }
+  
+  .meeting-link-input {
+    padding: var(--space-2, 0.5rem);
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 0.375rem);
+    font-size: 0.875rem;
+    background-color: var(--color-surface, #f8fafc);
+    color: var(--color-text-primary, #111827);
+  }
+  
+  .copy-btn {
+    padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+    background-color: var(--color-primary, #3b82f6);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md, 0.375rem);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+      background-color: var(--color-primary-dark, #2563eb);
+    }
+  }
+}
+
+.mt-info {
+  flex: 1;
+  
+  h3 {
+    margin: 0 0 var(--space-2, 0.5rem);
+    color: var(--color-text-primary, #111827);
+  }
+}
+
 

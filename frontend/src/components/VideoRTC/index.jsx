@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import Video from "twilio-video";
 import "./VideoRTC.scss";
 
-const VideoRTC = () => {
+const VideoRTC = ({ meetingData, onMeetingEnd }) => {
   const webcamFeedContainerRef = useRef(null);
   const mainFeedRef = useRef(null);
   const transcriptRef = useRef(null);
@@ -13,16 +13,12 @@ const VideoRTC = () => {
   // ✅ Initialize the Twilio room
   useEffect(() => {
     const startRoom = async () => {
-      const roomName = "room003";
+      if (!meetingData) {
+        console.error('No meeting data provided');
+        return;
+      }
 
-      const response = await fetch("https://57643cfd0548.ngrok-free.app/join-room", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ roomName }),
-      });
-
-      const { token } = await response.json();
-
+      const { roomName, token } = meetingData;
       room = await joinVideoRoom(roomName, token);
 
       // Handle the local participant first
@@ -38,6 +34,14 @@ const VideoRTC = () => {
       });
       room.on("participantDisconnected", handleDisconnectedParticipant);
 
+      // Handle room disconnection
+      room.on("disconnected", () => {
+        console.log("Room disconnected");
+        if (onMeetingEnd) {
+          onMeetingEnd();
+        }
+      });
+
       window.addEventListener("beforeunload", () => room.disconnect());
 
       // 🎤 Start mic capture + transcription
@@ -49,7 +53,7 @@ const VideoRTC = () => {
     return () => {
       if (room) room.disconnect();
     };
-  }, []);
+  }, [meetingData]);
 
   // ✅ Join room
   const joinVideoRoom = async (roomName, token) => {
@@ -204,7 +208,9 @@ const VideoRTC = () => {
         formData.append("participantId", room.localParticipant.identity);
 
         try {
-          const response = await fetch("https://57643cfd0548.ngrok-free.app/uploadAudio", {
+          // For network testing, replace with your host computer's IP
+          // Example: const response = await fetch("http://192.168.1.100:5000/uploadAudio", {
+          const response = await fetch("http://10.30.2.193:5000/uploadAudio", {
             method: "POST",
             body: formData,
           });

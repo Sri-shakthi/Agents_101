@@ -4,16 +4,23 @@ import VideoPanel from '../components/VideoPanel/index.jsx'
 import PrivateSuggestions from '../components/PrivateSuggestions/index.jsx'
 import PatientSearch from '../components/PatientSearch/index.jsx'
 import { patientApi } from '../services/patientApi.js'
+import { meetingApi } from '../services/meetingApi.js'
 import './DoctorLoginPage.scss'
 import VideoRTC from '../components/VideoRTC/index.jsx'
 
 function DoctorDashboardPage() {
   const user = useAppStore((s) => s.user)
-  const [meeting, setMeeting] = useState(false)
+  const [meeting, setMeetingState] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState(null)
   const [patients, setPatients] = useState([])
   const [loading, setLoading] = useState(false)
+  const [meetingData, setMeetingData] = useState(null)
+  const [meetingLink, setMeetingLink] = useState('')
   const logout = useAppStore((s) => s.logout)
+  const setMeeting = useAppStore((s) => s.setMeeting)
+  const setMeetingToken = useAppStore((s) => s.setMeetingToken)
+  const setMeetingRoomName = useAppStore((s) => s.setMeetingRoomName)
+  const clearMeeting = useAppStore((s) => s.clearMeeting)
 
   useEffect(() => {
     loadPatients()
@@ -34,6 +41,78 @@ function DoctorDashboardPage() {
 
   const handlePatientSelect = (patient) => {
     setSelectedPatient(patient)
+  }
+
+  const handleStartMeeting = async () => {
+    try {
+      setLoading(true)
+      
+      // Create meeting
+      const meetingResult = await meetingApi.createMeeting(
+        `Dr. ${user?.name || 'Doctor'}`,
+        user?.id
+      )
+
+      if (meetingResult.success) {
+        const { meeting } = meetingResult
+        
+        // Join the meeting as host
+        const joinResult = await meetingApi.joinMeeting(
+          meeting.meetingId,
+          `Dr. ${user?.name || 'Doctor'}`,
+          user?.id
+        )
+
+        if (joinResult.success) {
+          const meetingData = {
+            roomName: joinResult.roomName,
+            token: joinResult.token,
+            participantId: joinResult.participantId,
+            meetingId: meeting.meetingId
+          }
+
+          setMeetingData(meetingData)
+          setMeetingLink(meeting.meetingLink)
+          setMeeting(meeting)
+          setMeetingToken(joinResult.token)
+          setMeetingRoomName(joinResult.roomName)
+          setMeetingState(true)
+        } else {
+          console.error('Failed to join meeting:', joinResult.error)
+          alert('Failed to join meeting. Please try again.')
+        }
+      } else {
+        console.error('Failed to create meeting:', meetingResult.error)
+        alert('Failed to create meeting. Please try again.')
+      }
+    } catch (error) {
+      console.error('Error starting meeting:', error)
+      alert('Error starting meeting. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEndMeeting = async () => {
+    try {
+      if (meetingData?.meetingId) {
+        await meetingApi.stopMeeting(meetingData.meetingId, user?.id)
+      }
+    } catch (error) {
+      console.error('Error stopping meeting:', error)
+    } finally {
+      setMeetingState(false)
+      setMeetingData(null)
+      setMeetingLink('')
+      clearMeeting()
+    }
+  }
+
+  const handleMeetingEnd = () => {
+    setMeetingState(false)
+    setMeetingData(null)
+    setMeetingLink('')
+    clearMeeting()
   }
 
   return (
@@ -66,9 +145,10 @@ function DoctorDashboardPage() {
                 showVideo={true} 
                 showVideoBox={false} 
                 showDetails={true} 
-                onStartMeeting={() => setMeeting(true)} 
+                onStartMeeting={handleStartMeeting} 
                 showStartButton={true}
                 patient={selectedPatient}
+                loading={loading}
               />
             ) : (
               <div className="no-patient">
@@ -81,20 +161,42 @@ function DoctorDashboardPage() {
         <div className="meeting-stage">
           <div className="meeting-card">
             <div className="meeting-topbar meeting-topbar--light">
+              <div className="mt-info">
+                <h3>Meeting in Progress</h3>
+                {meetingLink && (
+                  <div className="meeting-link">
+                    <label>Meeting Link:</label>
+                    <input 
+                      type="text" 
+                      value={meetingLink} 
+                      readOnly 
+                      onClick={(e) => e.target.select()}
+                      className="meeting-link-input"
+                    />
+                    <button 
+                      onClick={() => navigator.clipboard.writeText(meetingLink)}
+                      className="copy-btn"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="mt-actions">
-                <button className="ps-btn" onClick={() => setMeeting(false)}>Close Meeting Window</button>
+                <button className="ps-btn ps-btn--secondary" onClick={handleEndMeeting}>
+                  End Meeting
+                </button>
+                <button className="ps-btn" onClick={handleMeetingEnd}>
+                  Close Meeting Window
+                </button>
               </div>
             </div>
             <div className="meeting-content meeting-content--light">
               <div className="meeting-video">
-                {/* <VideoPanel 
-                  showDetails={!meeting} 
-                  showVideo={true} 
-                  showVideoBox={true} 
-                  showStartButton={false}
-                  patient={selectedPatient}
-                /> */}
-                <VideoRTC />
+                <VideoRTC 
+                  meetingData={meetingData} 
+                  onMeetingEnd={handleMeetingEnd}
+                />
               </div>
               <div className="meeting-docked">
                 <PrivateSuggestions showLive={true} showProjection={false} showHeader={true} showList={true} />

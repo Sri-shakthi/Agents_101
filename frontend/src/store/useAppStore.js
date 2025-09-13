@@ -35,6 +35,10 @@ export const useAppStore = create((set, get) => ({
   // guest
   isGuest: persistedGuest?.isGuest ?? false,
   guestId: persistedGuest?.guestId ?? null,
+  // meeting
+  currentMeeting: null,
+  meetingToken: null,
+  meetingRoomName: null,
   login: async (credentials) => {
     // simulate a network delay
     await new Promise((r) => setTimeout(r, 800))
@@ -66,12 +70,29 @@ export const useAppStore = create((set, get) => ({
   },
   logout: async () => {
     await new Promise((r) => setTimeout(r, 600))
-    set({ isAuthenticated: false, user: null, isGuest: false, guestId: null })
+    set({ 
+      isAuthenticated: false, 
+      user: null, 
+      isGuest: false, 
+      guestId: null,
+      currentMeeting: null,
+      meetingToken: null,
+      meetingRoomName: null
+    })
     try {
       localStorage.removeItem('app_auth')
       localStorage.removeItem('app_guest')
     } catch {}
   },
+  // meeting actions
+  setMeeting: (meeting) => set({ currentMeeting: meeting }),
+  setMeetingToken: (token) => set({ meetingToken: token }),
+  setMeetingRoomName: (roomName) => set({ meetingRoomName: roomName }),
+  clearMeeting: () => set({ 
+    currentMeeting: null, 
+    meetingToken: null, 
+    meetingRoomName: null 
+  }),
 }))
 
 
