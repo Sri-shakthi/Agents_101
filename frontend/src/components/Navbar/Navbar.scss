@@ -32,10 +32,32 @@
 
 @media (max-width: 900px) {
   .navbar__inner { justify-content: space-between; }
+  
+  .navbar__user-info {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2, 0.5rem);
+  }
+  
+  .navbar__guest-id {
+    font-size: var(--font-size-xs, 0.75rem);
+  }
 }
 
 .navbar__actions {
   margin-left: auto;
+}
+
+.navbar__user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+}
+
+.navbar__guest-id {
+  color: var(--color-text-secondary, #6b7280);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 500;
 }
 
 .navbar__login .btn {

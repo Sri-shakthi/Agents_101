@@ -9,9 +9,14 @@ function Navbar() {
   const brand = useAppStore((s) => s.brand)
   const cfg = getBrandConfig(brand)
   const isAuthenticated = useAppStore((s) => s.isAuthenticated)
+  const isGuest = useAppStore((s) => s.isGuest)
+  const guestId = useAppStore((s) => s.guestId)
   const doLogout = useAppStore((s) => s.logout)
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
+  
+  const isLoggedIn = isAuthenticated || isGuest
+  
   const handleLogout = async () => {
     setLoading(true)
     await doLogout()
@@ -25,10 +30,15 @@ function Navbar() {
           <img className="navbar__logo" src={cfg.logoSrc} alt={cfg.alt} />
         </a>
         <div className="navbar__actions">
-          {isAuthenticated ? (
-            <Button className="navbar__login" onClick={handleLogout} disabled={loading}>
-              {loading ? 'Logging out…' : 'Logout'}
-            </Button>
+          {isLoggedIn ? (
+            <div className="navbar__user-info">
+              {isGuest && (
+                <span className="navbar__guest-id">Guest: {guestId}</span>
+              )}
+              <Button className="navbar__login" onClick={handleLogout} disabled={loading}>
+                {loading ? 'Logging out…' : 'Logout'}
+              </Button>
+            </div>
           ) : (
             <Link to="/doctor/login" className="navbar__login">
               <Button>Login</Button>
